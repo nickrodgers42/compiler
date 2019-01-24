@@ -38,7 +38,7 @@ void yyerror(const char*);
 %token RECORD;
 %token REF;
 %token REPEAT;
-%token        { %token RETURN;
+%token RETURN;
 %token STOP;
 %token SUCC;
 %token THEN;
@@ -77,15 +77,16 @@ void yyerror(const char*);
 %token NUM_DEC;
 %token CHAR;
 %token ESC_CHAR;
-%token NEWLINE;
-%token RETURN;
-%token BKSPC;
-%token TAB;
-%token FEED;
+%token NEWLINE_CHAR;
+%token RETURN_CHAR;
+%token BKSPC_CHAR;
+%token TAB_CHAR;
+%token FEED_CHAR;
 %token STR;
 %token COMMENT;
 
 %type <val> NUMBER
+%type
 
 %%
 

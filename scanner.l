@@ -97,11 +97,11 @@ write|WRITE          { return WRITE; }
 %}
 \'.\'           { return CHAR; }
 \'\\.[^nrbtf]\' { return ESC_CHAR; }
-\'\\n\'         { return NEWLINE; }
-\'\\r\'         { return RETURN; }
-\'\\b\'         { return BKSPC; }
-\'\\t\'         { return TAB; }
-\'\\f\'         { return FEED; }
+\'\\n\'         { return NEWLINE_CHAR; }
+\'\\r\'         { return RETURN_CHAR; }
+\'\\b\'         { return BKSPC_CHAR; }
+\'\\t\'         { return TAB_CHAR; }
+\'\\f\'         { return FEED_CHAR; }
 
 %{
    /* String constants */
