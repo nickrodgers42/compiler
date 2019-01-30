@@ -1,4 +1,12 @@
 %{
+   /**********************
+   *
+   * CPSL Scanner
+   *  
+   **********************/
+%}
+%option noyywrap
+%{
    /* Definitions */
 
    // These will be put verbatum at the beginning of the parser file
@@ -56,7 +64,7 @@ write|WRITE          { return WRITE; }
 %{
    /* Identifiers */
 %}
-[A-Za-z][A-Za-z0-9_]* { return IDENTIFIER; }
+[A-Za-z][A-Za-z0-9_]* { yyval.id = strdup(yytext); return IDENTIFIER; }
 
 %{
    /* Operators */
