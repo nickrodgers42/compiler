@@ -1,36 +1,34 @@
+%option noyywrap
+
 %{
    /**********************
    *
    * CPSL Scanner
    *  
    **********************/
-%}
-%option noyywrap
-%{
+   
    /* Definitions */
 
    // These will be put verbatum at the beginning of the parser file
    #include <cstdlib>
    #include "parser.hpp"
+
+   int line_num = 1;
 %}
-
-%{
-int line_num = 1;
-%}
-
-
 
 %%
 
 %{
-   /* Rules */
-%}
+   /***********************
+   *
+   * Rules 
+   *
+   ************************/
 
-%{
    /*********** Keywords ****************/
 %}
 array|ARRAY          { return ARRAY; }
-begin|BEGIN          { return BEGIN; }
+begin|BEGIN          { return BEGIN_TOKEN; }
 chr|CHR              { return CHR; }
 const|CONST          { return CONST; }
 do|DO                { return DO; }
@@ -64,7 +62,7 @@ write|WRITE          { return WRITE; }
 %{
    /* Identifiers */
 %}
-[A-Za-z][A-Za-z0-9_]* { yyval.id = strdup(yytext); return IDENTIFIER; }
+[A-Za-z][A-Za-z0-9_]* { yylval.id = strdup(yytext); return IDENTIFIER; }
 
 %{
    /* Operators */
@@ -96,9 +94,9 @@ write|WRITE          { return WRITE; }
 %{
    /* Integer Constants */
 %}
-0[0-7]+        { return NUM_OCT; }
-0x[0-9a-fA-F]+ { return NUM_HEX; }
-[1-9]+         { return NUM_DEC; }
+0[0-7]+        { yylval.val = atof(yytext); return NUM_OCT; }
+0x[0-9a-fA-F]+ { yylval.val = atof(yytext); return NUM_HEX; }
+[1-9]+         { yylval.val = atof(yytext); return NUM_DEC; }
 
 %{
    /* Character Constants */
@@ -126,12 +124,10 @@ write|WRITE          { return WRITE; }
 %}
  
 
-\n { line_num++; printf("\n"); }
+%{
+   /* Whitespace */
+%}
+[ \t] {}
+\n { line_num++; }
 
 %%
-
-/* User Code */
-
-int main(int argc, char *argv[]) {
-  yylex();
-}

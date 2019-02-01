@@ -1,18 +1,16 @@
+%token-table
 %{
-    /***********************
-    *
-    * CPSL Parser
-    *
-    ***********************/
-%}
-
-%{
+/***********************
+*
+* CPSL Parser
+*
+***********************/
 
 /* This section will be placed into the c++ file */
 #include <iostream>
 #include <map>
 
-#include "symbol_table.hpp"
+// #include "symbol_table.hpp"
 
 extern int yylex();
 void yyerror(const char*);
@@ -26,7 +24,7 @@ void yyerror(const char*);
 }
 
 %token ARRAY
-%token BEGIN
+%token BEGIN_TOKEN
 %token CHR
 %token CONST
 %token DO
@@ -93,7 +91,9 @@ void yyerror(const char*);
 %token STR
 %token COMMENT
 
-%type <val> NUMBER
+%type <val> NUM_OCT
+%type <val> NUM_HEX
+%type <val> NUM_DEC
 %type <id> IDENTIFIER
 
 %%
@@ -106,4 +106,7 @@ StatementList : ;
 void yyerror(const char* msg) 
 {
     std::cerr << msg << std::endl;
+}
+const char* token_name(int t) {
+  return yytname[YYTRANSLATE(t)];
 }
