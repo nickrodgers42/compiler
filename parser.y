@@ -91,13 +91,6 @@ void yyerror(const char*);
 %token STR
 %token COMMENT
 
-%token INT_IDENT;
-%token CHAR_IDENT;
-%token BOOLEAN_IDENT;
-%token STRING_IDENT;
-%token TRUE_IDENT;
-%token FALSE_IDENT;
-
 %type <val> NUM_OCT
 %type <val> NUM_HEX
 %type <val> NUM_DEC
@@ -106,7 +99,7 @@ void yyerror(const char*);
 %%
 
 
-Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcFuncDecl Block .
+Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcFuncDecl Block OPER_DOT
 
 OptionalConstDecl : 
                   | ConstantDecl
@@ -125,32 +118,35 @@ ProcFuncDecl : ProcFuncDecl
 
 ProcDecl : PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON FORWARD OPER_SEMICOLON
          | PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON Body OPER_SEMICOLON
+         ;
 
 FunctionDecl : FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON FORWARD OPER_SEMICOLON
              | FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type Body OPER_SEMICOLON
+             ;
 
 FormalParams : 
              | VarOrRef IdentList OPER_COLON Type 
              | VarOrRef IdentList OPER_COLON Type OPER_SEMICOLON FormalParams
+             ;
 
 VarOrRef :
          | VAR
          | REF 
          ;
 
-Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block 
+Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block ;
 
-Block : BEGIN_TOKEN StatementSeq END
+Block : BEGIN_TOKEN StatementSeq END ;
 
-ConstantDecl : const IdentStatementList
+ConstantDecl : const IdentStatementList ;
 
 IdentStatementList : IdentStatementList IdentStatement
                    | IdentStatement
                    ;
 
-IdentStatement : IDENTIFIER OPER_EQ Expression OPER_SEMICOLON
+IdentStatement : IDENTIFIER OPER_EQ Expression OPER_SEMICOLON ;
 
-TypeDecl : type TypeIdentList;
+TypeDecl : type TypeIdentList ;
 
 TypeIdentList : TypeIdentList TypeIdentStatement
               | TypeIdentStatement
@@ -161,19 +157,21 @@ TYPE : SimpleType
      | ArrayType
      ;
 SimpleType : IDENTIFIER ;
-RecordType : record IdentTypeList END
+RecordType : record IdentTypeList END ;
 IdentTypeList : 
               | IdentList : Type OPER_SEMICOLON
               | IdentTypeList
               ;
-ArrayType : ARRAY OPER_LBRACKET Expression : Expression OPER_RBRACKET OF Type
+ArrayType : ARRAY OPER_LBRACKET Expression : Expression OPER_RBRACKET OF Type ;
 IdentList : IDENTIFIER
           | IDENTIFIER, IdentList
+          ;
 
-VarDecl : VAR IdentList : Type OPER_SEMICOLON IdentTypeList
+VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentTypeList ; //Todo Checkk
 
 StatementSeq : Statement
              | Statement OPER_SEMICOLON StatementSeq
+             ;
 
 Statement : Assignment
           | IfStatement
@@ -206,7 +204,9 @@ RepeatStatement : REPEAT StatementSeq UNTIL Expression ;
 
 ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression ToOrDownto Expression DO StatementSeq END ;
 
-ToOrDownto : TO | DOWNTO ;
+ToOrDownto : TO 
+           | DOWNTO 
+           ;
 
 StopStatement : STOP ;
 
@@ -258,6 +258,7 @@ Expression : Expression OPER_OR Expression
            | PRED OPER_LPAREN Expression OPER_RPAREN
            | SUCC OPER_LPAREN Expression OPER_RPAREN
            | LValue
+           ;
            
 
 %%

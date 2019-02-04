@@ -59,16 +59,6 @@
 "while"|"WHILE"          { return WHILE; }
 "write"|"WRITE"          { return WRITE; }
 
-%{
-   /* Predefined Identifiers */
-%}
-"integer"|"INTEGER" { return INT_IDENT; } 
-"char"|"CHAR"       { return CHAR_IDENT; }
-"boolean"|"BOOLEAN" { return BOOLEAN_IDENT; }
-"string"|"STRING"   { return STRING_IDENT; }
-"true"|"TRUE"       { return TRUE_IDENT; }
-"false"|"FALSE"     { return FALSE_IDENT; }
-
 
 %{
    /* Identifiers */
