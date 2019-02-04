@@ -19,7 +19,7 @@ void yyerror(const char*);
 
 %union
 {
-    float val;
+    int val;
     char* id;
 }
 
@@ -77,10 +77,8 @@ void yyerror(const char*);
 %token OPER_LBRACKET
 %token OPER_RBRACKET
 %token OPER_ASSIGN
-%token OPER_PERCENT
-%token NUM_OCT
-%token NUM_HEX
-%token NUM_DEC
+%token OPER_MOD
+%token NUMBER
 %token CHAR
 %token ESC_CHAR
 %token NEWLINE_CHAR
@@ -89,85 +87,85 @@ void yyerror(const char*);
 %token TAB_CHAR
 %token FEED_CHAR
 %token STR
-%token COMMENT
 
-%type <val> NUM_OCT
-%type <val> NUM_HEX
-%type <val> NUM_DEC
+%type <val> NUMBER
 %type <id> IDENTIFIER
+
+%right UNMINUS 
+%left OPER_MUL OPER_DIV OPER_MOD
+%left OPER_ADD OPER_SUB
+%nonassoc OPER_EQ OPER_NEQ OPER_LT OPER_LEQ OPER_GT OPER_GEQ
+%right OPER_NOT
+%left OPER_AND
+%left OPER_OR
 
 %%
 
 
-Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcFuncDecl Block OPER_DOT
+Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT ;
 
-OptionalConstDecl : 
+OptionalConstDecl : %empty
                   | ConstantDecl
                   ;
-OptionalTypeDecl : 
+OptionalTypeDecl : %empty
                  | TypeDecl
                  ;
-OptionalVarDecl :
+OptionalVarDecl : %empty
                 | VarDecl
                 ;
+ProcOrFuncList : %empty
+               | ProcDecl ProcOrFuncList
+               | FuncDecl ProcOrFuncList
+               ;
 
-ProcFuncDecl : ProcFuncDecl
-             | FunctionDecl
-             | ProcDecl 
-             ;
+ConstantDecl : CONST IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList ;
+
+IdentExprList : %empty
+              | IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList
+              ;
 
 ProcDecl : PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON FORWARD OPER_SEMICOLON
          | PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON Body OPER_SEMICOLON
          ;
 
-FunctionDecl : FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON FORWARD OPER_SEMICOLON
-             | FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type Body OPER_SEMICOLON
-             ;
+FuncDecl : FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON FORWARD OPER_SEMICOLON
+         | FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON Body OPER_SEMICOLON
+         ;
 
-FormalParams : 
+FormalParams : %empty
              | VarOrRef IdentList OPER_COLON Type 
              | VarOrRef IdentList OPER_COLON Type OPER_SEMICOLON FormalParams
              ;
 
-VarOrRef :
-         | VAR
-         | REF 
-         ;
+VarOrRef : VAR | REF ;
 
 Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block ;
 
 Block : BEGIN_TOKEN StatementSeq END ;
 
-ConstantDecl : const IdentStatementList ;
+TypeDecl : TYPE IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList ;
 
-IdentStatementList : IdentStatementList IdentStatement
-                   | IdentStatement
-                   ;
-
-IdentStatement : IDENTIFIER OPER_EQ Expression OPER_SEMICOLON ;
-
-TypeDecl : type TypeIdentList ;
-
-TypeIdentList : TypeIdentList TypeIdentStatement
-              | TypeIdentStatement
+IdentTypeList : %empty
+              | IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList
               ;
-TypeIdentStatement : IDENTIFIER OPER_EQ TYPE ;
-TYPE : SimpleType
+
+Type : SimpleType
      | RecordType
      | ArrayType
      ;
-SimpleType : IDENTIFIER ;
-RecordType : record IdentTypeList END ;
-IdentTypeList : 
-              | IdentList : Type OPER_SEMICOLON
-              | IdentTypeList
-              ;
-ArrayType : ARRAY OPER_LBRACKET Expression : Expression OPER_RBRACKET OF Type ;
-IdentList : IDENTIFIER
-          | IDENTIFIER, IdentList
-          ;
 
-VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentTypeList ; //Todo Checkk
+SimpleType : IDENTIFIER ;
+RecordType : RECORD IdentListTypeList END ;
+ArrayType  : ARRAY OPER_LBRACKET Expression OPER_COLON Expression OPER_RBRACKET OF Type ;
+IdentList  : IDENTIFIER
+           | IDENTIFIER OPER_COMMA IdentList
+           ;
+
+IdentListTypeList : %empty
+                  | IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList
+                  ;
+
+VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList ;
 
 StatementSeq : Statement
              | Statement OPER_SEMICOLON StatementSeq
@@ -187,81 +185,66 @@ Statement : Assignment
           ;
 
 Assignment : LValue OPER_ASSIGN Expression ;
-
-IfStatement : if Expression then StatementSeq ElseIfStatement ElseStatement END ;
-
-ElseIfStatement : 
-                | ELSEIF Expression then StatementSeq ElseIfStatement
+IfStatement : IF Expression THEN StatementSeq ElseIfStatement ElseStatement END ;
+ElseIfStatement : %empty 
+                | ELSEIF Expression THEN StatementSeq ElseIfStatement
                 ;
-
-ElseStatement : 
-              | ELSE StatementSeq
+ElseStatement : %empty
+              | ELSE StatementSeq 
               ;
-
 WhileStatement : WHILE Expression DO StatementSeq END ;
-
 RepeatStatement : REPEAT StatementSeq UNTIL Expression ;
-
 ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression ToOrDownto Expression DO StatementSeq END ;
-
-ToOrDownto : TO 
-           | DOWNTO 
-           ;
-
+ToOrDownto : TO | DOWNTO ;
 StopStatement : STOP ;
-
 ReturnStatement : RETURN OptionalExpression ;
-
-OptionalExpression : 
-                   | Expression
-                   ;
-
+OptionalExpression : %empty | Expression ;
 ReadStatement : READ OPER_LPAREN LValueList OPER_RPAREN ;
-
 LValueList : LValue
            | LValue OPER_COMMA LValueList
            ;
-
 WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN ;
-
 ExpressionList : Expression 
                | Expression OPER_COMMA ExpressionList
                ;
-
-ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN ;
-
-OptionalExpressionList : 
+ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_LPAREN ;
+OptionalExpressionList : %empty
                        | ExpressionList
                        ;
-
 NullStatement : %empty ;
 
 Expression : Expression OPER_OR Expression
-           | Expression OPER_AND Expression
+           | Expression OPER_AND Expression           
            | Expression OPER_EQ Expression
-           | Expression OPER_NEQ Expresssion
-           | Expression OPER_LEQ Expresssion
-           | Expression OPER_GEQ Expresssion
-           | Expression OPER_LT Expresssion
-           | Expression OPER_GT Expresssion
-           | Expression OPER_ADD Expresssion
-           | Expression OPER_SUB Expresssion
-           | Expression OPER_MUL Expresssion
-           | Expression OPER_DIV Expresssion
-           | Expression OPER_PERCENT Expresssion           
+           | Expression OPER_NEQ Expression
+           | Expression OPER_LEQ Expression
+           | Expression OPER_GEQ Expression
+           | Expression OPER_LT Expression
+           | Expression OPER_GT Expression
+           | Expression OPER_ADD Expression
+           | Expression OPER_SUB Expression
+           | Expression OPER_MUL Expression
+           | Expression OPER_DIV Expression
+           | Expression OPER_MOD Expression
            | OPER_NOT Expression
-           | OPER_SUB Expression
+           | OPER_SUB Expression %prec UNMINUS
            | OPER_LPAREN Expression OPER_RPAREN
-//TODO           | IDENTIFIER OPER_LPAREN Expression OptionalExpressionList OPER_RPAREN
+           | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN
            | CHR OPER_LPAREN Expression OPER_RPAREN
            | ORD OPER_LPAREN Expression OPER_RPAREN
            | PRED OPER_LPAREN Expression OPER_RPAREN
            | SUCC OPER_LPAREN Expression OPER_RPAREN
-           | LValue
+           | LValue            
            ;
-           
 
-%%
+LValue : IDENTIFIER DotIdentOrBracketExpr ;
+
+DotIdentOrBracketExpr : %empty
+                      | OPER_DOT IDENTIFIER DotIdentOrBracketExpr
+                      | OPER_LBRACKET Expression OPER_RBRACKET DotIdentOrBracketExpr
+                      ;
+
+%%-
 
 void yyerror(const char* msg) 
 {
@@ -271,3 +254,4 @@ void yyerror(const char* msg)
 const char* token_name(int t) {
   return yytname[YYTRANSLATE(t)];
 }
+*

@@ -2,27 +2,21 @@
 #include <stdio.h>
 #include <string>
 
+extern int yyparse();
 extern int yylex();
 extern char* yytext;
 extern char* token_name(int t);
 
 int main(int argc, char** argv)
 {
-    if (argc == 2) {
-        if (std::string(argv[1]) == "-tokens") {
-            int token;
-            while ((token = yylex()) != 0) {
-                // printf("Token: %d (%s)\n", token, yytext);
-                printf("%s\n", token_name(token));
-            }
-        }
-    }
-    else {
+    if (argc == 2 && std::string(argv[1]) == "-tokens") {
         int token;
-        while((token = yylex()) != 0) {
-            continue;
+        while ((token = yylex()) != 0) {
+            printf("%s\n", token_name(token));
         }
     }
-    // printf("%d", yylex());
-    return 0;
+    else if (argc == 2 && std::string(argv[1]) == "-v") {
+
+    } 
+    yyparse();
 };

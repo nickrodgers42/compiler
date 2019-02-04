@@ -59,7 +59,6 @@
 "while"|"WHILE"          { return WHILE; }
 "write"|"WRITE"          { return WRITE; }
 
-
 %{
    /* Identifiers */
 %}
@@ -90,38 +89,30 @@
 "["   { return OPER_LBRACKET; }
 "]"   { return OPER_RBRACKET; }
 ":="  { return OPER_ASSIGN; }
-"%"   { return OPER_PERCENT; }
+"%"   { return OPER_MOD; }
 
 
 %{
    /* Integer Constants */
 %}
-0[0-7]+        { yylval.val = atof(yytext); return NUM_OCT; }
-0x[0-9a-fA-F]+ { yylval.val = atof(yytext); return NUM_HEX; }
-[1-9]+         { yylval.val = atof(yytext); return NUM_DEC; }
+0[0-7]+        { yylval.val = atoi(yytext); return NUMBER; }
+0x[0-9a-fA-F]+ { yylval.val = atoi(yytext); return NUMBER; }
+[1-9]+         { yylval.val = atoi(yytext); return NUMBER; }
 
 %{
    /* Character Constants */
 %}
-\'.\'           { return CHAR; }
-\'\\.[^nrbtf]\' { return ESC_CHAR; }
-\'\\n\'         { return NEWLINE_CHAR; }
-\'\\r\'         { return RETURN_CHAR; }
-\'\\b\'         { return BKSPC_CHAR; }
-\'\\t\'         { return TAB_CHAR; }
-\'\\f\'         { return FEED_CHAR; }
+\'.\'|\'\\.\'        { yylval.id = strdup(yytext); return CHAR; }
 
 %{
    /* String constants */
 %}
-\".*[^\n]\" { return STR; }
+\".*[^\n]\" { yylval.id = strdup(yytext); return STR; }
 
 %{
   /* Comments */
 %}
-\$.* { return COMMENT; }
-
-
+\$.* {}
 
 %{
    /* Errors */
