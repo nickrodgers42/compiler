@@ -243,7 +243,7 @@ DotIdentOrBracketExpr : %empty
                       | OPER_LBRACKET Expression OPER_RBRACKET DotIdentOrBracketExpr
                       ;
 
-%%-
+%%
 
 void yyerror(const char* msg) 
 {
@@ -253,4 +253,3 @@ void yyerror(const char* msg)
 const char* token_name(int t) {
   return yytname[YYTRANSLATE(t)];
 }
-*
