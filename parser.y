@@ -21,6 +21,8 @@ void yyerror(const char*);
 {
     int val;
     char* id;
+    char* string;
+    char chr;
 }
 
 %token ARRAY
@@ -80,16 +82,12 @@ void yyerror(const char*);
 %token OPER_MOD
 %token NUMBER
 %token CHAR
-%token ESC_CHAR
-%token NEWLINE_CHAR
-%token RETURN_CHAR
-%token BKSPC_CHAR
-%token TAB_CHAR
-%token FEED_CHAR
 %token STR
 
 %type <val> NUMBER
 %type <id> IDENTIFIER
+%type <chr> CHAR
+%type <string> STR
 
 %right UNMINUS 
 %left OPER_MUL OPER_DIV OPER_MOD
@@ -204,13 +202,14 @@ LValueList : LValue
            | LValue OPER_COMMA LValueList
            ;
 WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN ;
+ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN ;
+OptionalExpressionList : %empty
+                       | Expression
+                       | Expression OPER_COMMA ExpressionList
+                       ;
 ExpressionList : Expression 
                | Expression OPER_COMMA ExpressionList
                ;
-ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_LPAREN ;
-OptionalExpressionList : %empty
-                       | ExpressionList
-                       ;
 NullStatement : %empty ;
 
 Expression : Expression OPER_OR Expression
