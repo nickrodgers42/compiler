@@ -97,6 +97,7 @@ void yyerror(const char*);
 %left OPER_AND
 %left OPER_OR
 
+%define parse.error verbose
 %%
 
 
@@ -234,6 +235,9 @@ Expression : Expression OPER_OR Expression
            | PRED OPER_LPAREN Expression OPER_RPAREN
            | SUCC OPER_LPAREN Expression OPER_RPAREN
            | LValue            
+           | NUMBER
+           | STR
+           | CHR
            ;
 
 LValue : IDENTIFIER DotIdentOrBracketExpr ;
