@@ -97,7 +97,7 @@
 %}
 0[0-7]+        { yylval.val = atoi(yytext); return NUMBER; }
 0x[0-9a-fA-F]+ { yylval.val = atoi(yytext); return NUMBER; }
-[1-9]+         { yylval.val = atoi(yytext); return NUMBER; }
+[0-9]+         { yylval.val = atoi(yytext); return NUMBER; }
 
 %{
    /* Character Constants */

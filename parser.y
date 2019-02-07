@@ -13,8 +13,9 @@
 // #include "symbol_table.hpp"
 
 extern int yylex();
+extern int line_num;
 void yyerror(const char*);
-
+int yydebug = 1;
 %}
 
 %union
@@ -98,6 +99,7 @@ void yyerror(const char*);
 %left OPER_OR
 
 %define parse.error verbose
+%debug
 %%
 
 
@@ -136,7 +138,7 @@ FormalParams : %empty
              | VarOrRef IdentList OPER_COLON Type OPER_SEMICOLON FormalParams
              ;
 
-VarOrRef : VAR | REF ;
+VarOrRef : %empty | VAR | REF ;
 
 Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block ;
 
@@ -208,8 +210,8 @@ OptionalExpressionList : %empty
                        | Expression
                        | Expression OPER_COMMA ExpressionList
                        ;
-ExpressionList : Expression 
-               | Expression OPER_COMMA ExpressionList
+ExpressionList : Expression OPER_COMMA ExpressionList
+               | Expression 
                ;
 NullStatement : %empty ;
 
@@ -229,7 +231,7 @@ Expression : Expression OPER_OR Expression
            | OPER_NOT Expression
            | OPER_SUB Expression %prec UNMINUS
            | OPER_LPAREN Expression OPER_RPAREN
-           | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN
+           | IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN
            | CHR OPER_LPAREN Expression OPER_RPAREN
            | ORD OPER_LPAREN Expression OPER_RPAREN
            | PRED OPER_LPAREN Expression OPER_RPAREN
@@ -237,7 +239,7 @@ Expression : Expression OPER_OR Expression
            | LValue            
            | NUMBER
            | STR
-           | CHR
+           | CHAR
            ;
 
 LValue : IDENTIFIER DotIdentOrBracketExpr ;
@@ -251,7 +253,7 @@ DotIdentOrBracketExpr : %empty
 
 void yyerror(const char* msg) 
 {
-    std::cerr << msg << std::endl;
+    std::cerr << "ERROR: " << msg << std::endl;
 }
 
 const char* token_name(int t) {
