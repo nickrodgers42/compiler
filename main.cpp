@@ -1,4 +1,3 @@
-#include "symbol_table.hpp"
 #include <stdio.h>
 #include <string>
 
