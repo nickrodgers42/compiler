@@ -6,3 +6,9 @@ Makefile
 parser.cpp
 parser.hpp
 scanner.cpp
+*.dot
+*.output
+cpsl
+*.txt
+*.tab.c
+TestFiles/

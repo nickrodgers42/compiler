@@ -15,7 +15,6 @@
 extern int yylex();
 extern int line_num;
 void yyerror(const char*);
-int yydebug = 1;
 %}
 
 %union
@@ -99,7 +98,6 @@ int yydebug = 1;
 %left OPER_OR
 
 %define parse.error verbose
-%debug
 %%
 
 
