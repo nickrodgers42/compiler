@@ -251,7 +251,7 @@ DotIdentOrBracketExpr : %empty
 
 void yyerror(const char* msg) 
 {
-    std::cerr << "ERROR: " << msg << std::endl;
+    std::cerr << "ERROR on line " << line_num << " " << msg << std::endl;
 }
 
 const char* token_name(int t) {
