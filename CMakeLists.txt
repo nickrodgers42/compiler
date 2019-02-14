@@ -14,13 +14,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 
 set(cpsl
-  main.cpp
+  register.hpp
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}
 )
 source_group("cpsl" FILES ${cpsl})
 
-add_executable(cpsl ${cpsl})
+add_executable(cpsl main.cpp ${cpsl})
 target_link_libraries(cpsl ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
 target_include_directories(cpsl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(test_files
+  test/registerTest.cpp test/registerTest.hpp
+)
+add_executable(testProgram test/testMain.cpp ${test_files} ${cpsl})
+target_link_libraries(testProgram ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
+target_include_directories(testProgram PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
