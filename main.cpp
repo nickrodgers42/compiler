@@ -6,9 +6,9 @@
 #include "register.hpp"
 
 extern int yyparse();
-extern int yylex();
-extern char* yytext;
-extern char* token_name(int t);
+// extern int yylex();
+// extern char* yytext;
+// extern char* token_name(int t);
 
 RegisterPool *RegisterPool::instance = 0;
 

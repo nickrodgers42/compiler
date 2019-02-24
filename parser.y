@@ -9,6 +9,7 @@
 /* This section will be placed into the c++ file */
 #include <iostream>
 #include <map>
+#include "./types/StopStatement.hpp"
 
 // #include "symbol_table.hpp"
 
@@ -101,150 +102,160 @@ void yyerror(const char*);
 %%
 
 
-Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT ;
+Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT {};
 
-OptionalConstDecl : %empty
-                  | ConstantDecl
+OptionalConstDecl : %empty {}
+                  | ConstantDecl {}
                   ;
-OptionalTypeDecl : %empty
-                 | TypeDecl
+OptionalTypeDecl : %empty {}
+                 | TypeDecl {}
                  ;
-OptionalVarDecl : %empty
-                | VarDecl
+OptionalVarDecl : %empty {}
+                | VarDecl {}
                 ;
-ProcOrFuncList : %empty
-               | ProcDecl ProcOrFuncList
-               | FuncDecl ProcOrFuncList
+ProcOrFuncList : %empty {}
+               | ProcDecl ProcOrFuncList {}
+               | FuncDecl ProcOrFuncList {}
                ;
 
-ConstantDecl : CONST IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList ;
+ConstantDecl : CONST IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList {};
 
-IdentExprList : %empty
-              | IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList
+IdentExprList : %empty {}
+              | IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList {}
               ;
 
-ProcDecl : PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON FORWARD OPER_SEMICOLON
-         | PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON Body OPER_SEMICOLON
+ProcDecl : PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON FORWARD OPER_SEMICOLON {}
+         | PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON Body OPER_SEMICOLON {}
          ;
 
-FuncDecl : FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON FORWARD OPER_SEMICOLON
-         | FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON Body OPER_SEMICOLON
+FuncDecl : FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON FORWARD OPER_SEMICOLON {}
+         | FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON Type OPER_SEMICOLON Body OPER_SEMICOLON {}
          ;
 
-FormalParams : %empty
-             | VarOrRef IdentList OPER_COLON Type 
-             | VarOrRef IdentList OPER_COLON Type OPER_SEMICOLON FormalParams
+FormalParams : %empty {}
+             | VarOrRef IdentList OPER_COLON Type {}
+             | VarOrRef IdentList OPER_COLON Type OPER_SEMICOLON FormalParams {}
              ;
 
-VarOrRef : %empty | VAR | REF ;
+VarOrRef : %empty {}
+         | VAR {}
+         | REF {}
+         ;
 
-Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block ;
+Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block {};
 
-Block : BEGIN_TOKEN StatementSeq END ;
+Block : BEGIN_TOKEN StatementSeq END {};
 
-TypeDecl : TYPE IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList ;
+TypeDecl : TYPE IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList {};
 
-IdentTypeList : %empty
-              | IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList
+IdentTypeList : %empty {}
+              | IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList {}
               ;
 
-Type : SimpleType
-     | RecordType
-     | ArrayType
+Type : SimpleType {}
+     | RecordType {}
+     | ArrayType {}
      ;
 
-SimpleType : IDENTIFIER ;
-RecordType : RECORD IdentListTypeList END ;
-ArrayType  : ARRAY OPER_LBRACKET Expression OPER_COLON Expression OPER_RBRACKET OF Type ;
-IdentList  : IDENTIFIER
-           | IDENTIFIER OPER_COMMA IdentList
+SimpleType : IDENTIFIER {} ;
+RecordType : RECORD IdentListTypeList END {} ;
+ArrayType  : ARRAY OPER_LBRACKET Expression OPER_COLON Expression OPER_RBRACKET OF Type {};
+IdentList  : IDENTIFIER {}
+           | IDENTIFIER OPER_COMMA IdentList {}
            ;
 
-IdentListTypeList : %empty
-                  | IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList
+IdentListTypeList : %empty {}
+                  | IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList {}
                   ;
 
-VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList ;
+VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList {};
 
-StatementSeq : Statement
-             | Statement OPER_SEMICOLON StatementSeq
+StatementSeq : Statement {}
+             | Statement OPER_SEMICOLON StatementSeq {}
              ;
 
-Statement : Assignment
-          | IfStatement
-          | WhileStatement
-          | RepeatStatement
-          | ForStatement
-          | StopStatement
-          | ReturnStatement
-          | ReadStatement
-          | WriteStatement
-          | ProcedureCall
-          | NullStatement
+Statement : Assignment {}
+          | IfStatement {}
+          | WhileStatement {}
+          | RepeatStatement {}
+          | ForStatement {}
+          | StopStatement {$$ = $1;}
+          | ReturnStatement {}
+          | ReadStatement {}
+          | WriteStatement {}
+          | ProcedureCall {}
+          | NullStatement {}
           ;
 
-Assignment : LValue OPER_ASSIGN Expression ;
-IfStatement : IF Expression THEN StatementSeq ElseIfStatement ElseStatement END ;
-ElseIfStatement : %empty 
-                | ELSEIF Expression THEN StatementSeq ElseIfStatement
+Assignment : LValue OPER_ASSIGN Expression {};
+IfStatement : IF Expression THEN StatementSeq ElseIfStatement ElseStatement END {};
+ElseIfStatement : %empty {}
+                | ELSEIF Expression THEN StatementSeq ElseIfStatement {}
                 ;
-ElseStatement : %empty
-              | ELSE StatementSeq 
+ElseStatement : %empty {}
+              | ELSE StatementSeq {}
               ;
-WhileStatement : WHILE Expression DO StatementSeq END ;
-RepeatStatement : REPEAT StatementSeq UNTIL Expression ;
-ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression ToOrDownto Expression DO StatementSeq END ;
-ToOrDownto : TO | DOWNTO ;
-StopStatement : STOP ;
-ReturnStatement : RETURN OptionalExpression ;
-OptionalExpression : %empty | Expression ;
-ReadStatement : READ OPER_LPAREN LValueList OPER_RPAREN ;
-LValueList : LValue
-           | LValue OPER_COMMA LValueList
+WhileStatement : WHILE Expression DO StatementSeq END {};
+RepeatStatement : REPEAT StatementSeq UNTIL Expression {};
+ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression ToOrDownto Expression DO StatementSeq END {};
+ToOrDownto : TO {}
+           | DOWNTO {} 
            ;
-WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN ;
-ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN ;
-OptionalExpressionList : %empty
-                       | Expression
-                       | Expression OPER_COMMA ExpressionList
+
+StopStatement : STOP {
+        $$ = new StopStatement();
+    };
+
+ReturnStatement : RETURN OptionalExpression {};
+OptionalExpression : %empty {}
+                   | Expression {};
+ReadStatement : READ OPER_LPAREN LValueList OPER_RPAREN {};
+LValueList : LValue {}
+           | LValue OPER_COMMA LValueList {}
+           ;
+WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN {};
+ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN {} ;
+OptionalExpressionList : %empty {}
+                       | Expression {}
+                       | Expression OPER_COMMA ExpressionList {}
                        ;
-ExpressionList : Expression OPER_COMMA ExpressionList
-               | Expression 
+ExpressionList : Expression OPER_COMMA ExpressionList {}
+               | Expression {}
                ;
-NullStatement : %empty ;
+NullStatement : %empty {};
 
-Expression : Expression OPER_OR Expression
-           | Expression OPER_AND Expression           
-           | Expression OPER_EQ Expression
-           | Expression OPER_NEQ Expression
-           | Expression OPER_LEQ Expression
-           | Expression OPER_GEQ Expression
-           | Expression OPER_LT Expression
-           | Expression OPER_GT Expression
-           | Expression OPER_ADD Expression
-           | Expression OPER_SUB Expression
-           | Expression OPER_MUL Expression
-           | Expression OPER_DIV Expression
-           | Expression OPER_MOD Expression
-           | OPER_NOT Expression
-           | OPER_SUB Expression %prec UNMINUS
-           | OPER_LPAREN Expression OPER_RPAREN
-           | IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN
-           | CHR OPER_LPAREN Expression OPER_RPAREN
-           | ORD OPER_LPAREN Expression OPER_RPAREN
-           | PRED OPER_LPAREN Expression OPER_RPAREN
-           | SUCC OPER_LPAREN Expression OPER_RPAREN
-           | LValue            
-           | NUMBER
-           | STR
-           | CHAR
+Expression : Expression OPER_OR Expression  { $$ = new OrExpr($1, $3); }
+           | Expression OPER_AND Expression { $$ = new AndExpr($1, $3); }
+           | Expression OPER_EQ Expression  { $$ = new EqExpr($1, $3); }
+           | Expression OPER_NEQ Expression { $$ = new NeqExpr($1, $3); }
+           | Expression OPER_LEQ Expression { $$ = new LeqExpr($1, $3); }
+           | Expression OPER_GEQ Expression { $$ = new GeqExpr($1, $3); }
+           | Expression OPER_LT Expression  { $$ = new LtExpr($1, $3); }
+           | Expression OPER_GT Expression  { $$ = new GtExpr($1, $3); }
+           | Expression OPER_ADD Expression { $$ = new AddExpr($1, $3); }
+           | Expression OPER_SUB Expression { $$ = new SubExpr($1, $3); }
+           | Expression OPER_MUL Expression { $$ = new MulExpr($1, $3); }
+           | Expression OPER_DIV Expression { $$ = new DivExpr($1, $3); }
+           | Expression OPER_MOD Expression { $$ = new ModExpr($1, $3); }
+           | OPER_NOT Expression { $$ = new NotExpr($2); }
+           | OPER_SUB Expression %prec UNMINUS {$$ = new UnminusExpr($2); }
+           | OPER_LPAREN Expression OPER_RPAREN { $$ = new Expression($2); }
+           | IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN {}
+           | CHR OPER_LPAREN Expression OPER_RPAREN { $$ = new ChrExpr($3); }
+           | ORD OPER_LPAREN Expression OPER_RPAREN { $$ = new OrdExpr($3); }
+           | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = new PredExpr($3); }
+           | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = new SuccExpr($3); }
+           | LValue {}
+           | NUMBER {}
+           | STR { $$ = }
+           | CHAR {}
            ;
 
-LValue : IDENTIFIER DotIdentOrBracketExpr ;
+LValue : IDENTIFIER DotIdentOrBracketExpr {};
 
-DotIdentOrBracketExpr : %empty
-                      | OPER_DOT IDENTIFIER DotIdentOrBracketExpr
-                      | OPER_LBRACKET Expression OPER_RBRACKET DotIdentOrBracketExpr
+DotIdentOrBracketExpr : %empty {}
+                      | OPER_DOT IDENTIFIER DotIdentOrBracketExpr {}
+                      | OPER_LBRACKET Expression OPER_RBRACKET DotIdentOrBracketExpr {}
                       ;
 
 %%
