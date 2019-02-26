@@ -5,7 +5,7 @@
 
 class ExprValue {
     public:
-        virtual Register* r = 0;
+        virtual Register* getRegister() = 0;
         virtual bool isLiteral() { return false; }
 };
 

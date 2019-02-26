@@ -9,6 +9,7 @@
 /* This section will be placed into the c++ file */
 #include <iostream>
 #include <map>
+#include "./expressions/ExprMakers.hpp"
 #include "./types/StopStatement.hpp"
 
 // #include "symbol_table.hpp"
@@ -77,7 +78,7 @@ void yyerror(const char*);
 %token OPER_SEMICOLON
 %token OPER_LPAREN
 %token OPER_RPAREN
-%token OPER_LBRACKET
+%token OPER_LBRACKET`
 %token OPER_RBRACKET
 %token OPER_ASSIGN
 %token OPER_MOD
@@ -224,39 +225,36 @@ ExpressionList : Expression OPER_COMMA ExpressionList {}
                ;
 NullStatement : %empty {};
 
-Expression : Expression OPER_OR Expression  { $$ = new OrExpr($1, $3); }
-           | Expression OPER_AND Expression { $$ = new AndExpr($1, $3); }
-           | Expression OPER_EQ Expression  { $$ = new EqExpr($1, $3); }
-           | Expression OPER_NEQ Expression { $$ = new NeqExpr($1, $3); }
-           | Expression OPER_LEQ Expression { $$ = new LeqExpr($1, $3); }
-           | Expression OPER_GEQ Expression { $$ = new GeqExpr($1, $3); }
-           | Expression OPER_LT Expression  { $$ = new LtExpr($1, $3); }
-           | Expression OPER_GT Expression  { $$ = new GtExpr($1, $3); }
-           | Expression OPER_ADD Expression { $$ = new AddExpr($1, $3); }
-           | Expression OPER_SUB Expression { $$ = new SubExpr($1, $3); }
-           | Expression OPER_MUL Expression { $$ = new MulExpr($1, $3); }
-           | Expression OPER_DIV Expression { $$ = new DivExpr($1, $3); }
-           | Expression OPER_MOD Expression { $$ = new ModExpr($1, $3); }
+Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
+           | Expression OPER_AND Expression { $$ = getAndExpr($1, $3); }
+           | Expression OPER_EQ Expression  { $$ = getEqExpr($1, $3); }
+           | Expression OPER_NEQ Expression { $$ = getNeqExpr($1, $3); }
+           | Expression OPER_LEQ Expression { $$ = getLeqExpr($1, $3); }
+           | Expression OPER_GEQ Expression { $$ = getGeqExpr($1, $3); }
+           | Expression OPER_LT Expression  { $$ = getLtExpr($1, $3); }
+           | Expression OPER_GT Expression  { $$ = getGtExpr($1, $3); }
+           | Expression OPER_ADD Expression { $$ = getAddExpr($1, $3); }
+           | Expression OPER_SUB Expression { $$ = getSubExpr($1, $3); }
+           | Expression OPER_MUL Expression { $$ = getMulExpr($1, $3); }
+           | Expression OPER_DIV Expression { $$ = getDivExpr($1, $3); }
+           | Expression OPER_MOD Expression { $$ = getModExpr($1, $3); }
            | OPER_NOT Expression { $$ = new NotExpr($2); }
            | OPER_SUB Expression %prec UNMINUS {$$ = new UnminusExpr($2); }
            | OPER_LPAREN Expression OPER_RPAREN { $$ = new Expression($2); }
-           | IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN {}
+           | IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN { $$ = nullptr; }
            | CHR OPER_LPAREN Expression OPER_RPAREN { $$ = new ChrExpr($3); }
            | ORD OPER_LPAREN Expression OPER_RPAREN { $$ = new OrdExpr($3); }
            | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = new PredExpr($3); }
            | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = new SuccExpr($3); }
            | LValue {}
            | NUMBER {}
-           | STR { $$ = }
+           | STR {}
            | CHAR {}
            ;
 
-LValue : IDENTIFIER DotIdentOrBracketExpr {};
-
-DotIdentOrBracketExpr : %empty {}
-                      | OPER_DOT IDENTIFIER DotIdentOrBracketExpr {}
-                      | OPER_LBRACKET Expression OPER_RBRACKET DotIdentOrBracketExpr {}
-                      ;
+LValue : IDENTIFIER {}
+       | LValue OPER_LBRACKET Expression OPER_RBRACKET {}
+       | LVALUE OPER_DOT IDENTIFIER {};
 
 %%
 

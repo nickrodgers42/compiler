@@ -3,7 +3,7 @@
 #include "registerTest.hpp"
 #include "../exceptions/TypeMismatch.hpp"
 
-RegisterPool* RegisterPool::instance = 0;
+// RegisterPool* RegisterPool::instance = 0;
 
 int main ()
 {
