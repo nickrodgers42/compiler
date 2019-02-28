@@ -7,18 +7,17 @@ class LtExpr : public Expression {
     private:
         Expression* a;
         Expression* b;
-        ExprValue* value;
     public:
-        LtExpr(Expression* e1, Expression* e2): a(e1), b(e2) {}
+        LtExpr(Expression* e1, Expression* e2, Type* type) : Expression(type), a(e1), b(e2) {}
         Register* emit() {
             auto regA = a->emit();
             auto regB = b->emit();
-            value = new RegisterValue();
-            std::cout << "slt " << value->getRegister() << ", "
+            auto result = new Register();
+            std::cout << "slt " << result->getRegister() << ", "
                       << regA->getRegister() << ", "
                       << regB->getRegister() 
                       << std::endl;
-            return value->getRegister();
+            return result;
         }
 };
 

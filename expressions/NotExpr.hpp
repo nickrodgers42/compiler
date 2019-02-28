@@ -6,16 +6,15 @@
 class NotExpr : public Expression { 
     private:
         Expression* a;
-        ExprValue* value;
     public:
-        NotExpr(Expression* e1): a(e1) {}
+        NotExpr(Expression* e1, Type* type) : Expression(type), a(e1) {}
         Register* emit() {
             auto regA = a->emit();
-            value = new RegisterValue();
-            std::cout << "not " << value->getRegister() << ", "
+            auto result = new Register();
+            std::cout << "not " << result->getRegister() << ", "
                       << regA->getRegister()
                       << std::endl;
-            return value->getRegister();
+            return result;
         }
 };
 

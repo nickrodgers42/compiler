@@ -198,29 +198,27 @@ ElseStatement : %empty {}
               ;
 WhileStatement : WHILE Expression DO StatementSeq END {};
 RepeatStatement : REPEAT StatementSeq UNTIL Expression {};
-ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression ToOrDownto Expression DO StatementSeq END {};
-ToOrDownto : TO {}
-           | DOWNTO {} 
-           ;
+ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression TO Expression DO StatementSeq END {}
+             | FOR IDENTIFIER OPER_ASSIGN Expression DOWNTO Expression DO StatementSeq END {}
+             ;
 
 StopStatement : STOP {
         $$ = new StopStatement();
     };
 
-ReturnStatement : RETURN OptionalExpression {};
-OptionalExpression : %empty {}
-                   | Expression {};
+ReturnStatement : RETURN {}
+                | RETURN Expression {}
+                ;
 ReadStatement : READ OPER_LPAREN LValueList OPER_RPAREN {};
 LValueList : LValue {}
-           | LValue OPER_COMMA LValueList {}
+           | LvalueList OPER_COMMA LValue {}
            ;
 WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN {};
-ProcedureCall : IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN {} ;
-OptionalExpressionList : %empty {}
-                       | Expression {}
-                       | Expression OPER_COMMA ExpressionList {}
-                       ;
-ExpressionList : Expression OPER_COMMA ExpressionList {}
+ProcedureCall : IDENTIFIER OPER_LPAREN OPER_RPAREN {} 
+              | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN {}
+              ;
+
+ExpressionList : ExpressionList OPER_COMMA Expression {}
                | Expression {}
                ;
 NullStatement : %empty {};
@@ -241,15 +239,16 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
            | OPER_NOT Expression { $$ = getNotExpr($2); }
            | OPER_SUB Expression %prec UNMINUS {$$ = getUnminusExpr($2); }
            | OPER_LPAREN Expression OPER_RPAREN { $$ = new Expression($2); }
-           | IDENTIFIER OPER_LPAREN OptionalExpressionList OPER_RPAREN { $$ = nullptr; }
-           | CHR OPER_LPAREN Expression OPER_RPAREN { $$ = new ChrExpr($3); }
-           | ORD OPER_LPAREN Expression OPER_RPAREN { $$ = new OrdExpr($3); }
-           | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = new PredExpr($3); }
-           | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = new SuccExpr($3); }
+           | IDENTIFIER OPER_LPAREN OPER_RPAREN { $$ = nullptr; }
+           | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN { $$ = nullptr; }
+           | CHR OPER_LPAREN Expression OPER_RPAREN { $$ = makeCharacterType($3); }
+           | ORD OPER_LPAREN Expression OPER_RPAREN { $$ = makeIntegerType($3); }
+           | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = predValue($3); }
+           | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = succValue($3); }
            | LValue {}
-           | NUMBER {}
+           | NUMBER { $$ = new IntegerLiteral($1); }
            | STR {}
-           | CHAR {}
+           | CHAR { $$ = new CharacterLiteral($1); }
            ;
 
 LValue : IDENTIFIER {}

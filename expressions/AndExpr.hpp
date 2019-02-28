@@ -7,18 +7,17 @@ class AndExpr : public Expression {
     private:
         Expression* a;
         Expression* b;
-        ExprValue* value;
     public:
-        AndExpr(Expression* e1, Expression* e2): a(e1), b(e2) {}
+        AndExpr(Expression* e1, Expression* e2, Type* type) : Expression(type), a(e1), b(e2) {}
         Register* emit() {
             auto regA = a->emit();
             auto regB = b->emit();
-            value = new RegisterValue();
-            std::cout << "and " << value->getRegister() << ", "
+            auto result = new Register();
+            std::cout << "and " << result->getRegister() << ", "
                       << regA->getRegister() << ", "
                       << regB->getRegister() 
                       << std::endl;
-            return value->getRegister();
+            return result;
         }
 };
 

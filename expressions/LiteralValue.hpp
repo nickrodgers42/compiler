@@ -8,20 +8,20 @@
 
 #include <string>
 
-#include "ExprValue.hpp"
-#include "../register.hpp"
-
 class LiteralValue : public ExprValue {
     private:
-        Register* reg = new Register();
+        Register* reg;
     public:
-        LiteralValue();
-        Register* getRegister() {
-            return reg;
+        LiteralValue() {
+            reg = new Register();
         }
-        bool isLiteral() {
+        bool isLiteral() override {
             return true;
         }
+        Register* getRegister() override {
+            return reg;
+        }
+
 };
 
 #endif

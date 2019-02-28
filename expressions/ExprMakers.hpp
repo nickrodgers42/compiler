@@ -38,6 +38,9 @@ Expression* getOrExpr(Expression* a, Expression* b);
 Expression* getAndExpr(Expression* a, Expression* b);
 Expression* getNotExpr(Expression* a);
 Expression* getUnminusExpr(Expression* a);
- 
+Expression* makeCharacterType(Expression* a);
+Expression* makeIntegerType(Expression* a);
+Expression* predValue(Expression* a);
+Expression* succValue(Expression* a);
 
 #endif

@@ -2,7 +2,8 @@
 #define TYPE_HPP
 
 class Type {
-    virtual int size() = 0;
+    public:
+        virtual int size() = 0;
 };
 
 #endif

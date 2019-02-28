@@ -5,7 +5,7 @@
 
 class CharacterType : public Type {
     public:
-        int size() {
+        int size() override {
             return 4;
         };
 };

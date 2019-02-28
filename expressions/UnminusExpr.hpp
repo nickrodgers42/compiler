@@ -6,16 +6,15 @@
 class UnminusExpr : public Expression { 
     private:
         Expression* a;
-        ExprValue* value;
     public:
         UnminusExpr(Expression* e1): a(e1) {}
         Register* emit() {
             auto regA = a->emit();
-            value = new RegisterValue();
-            std::cout << "neg " << value->getRegister() << ", "
+            auto result = new Register();
+            std::cout << "neg " << result->getRegister() << ", "
                       << regA->getRegister()
                       << std::endl;
-            return value->getRegister();
+            return result;
         }
 };
 

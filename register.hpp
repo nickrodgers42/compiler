@@ -60,6 +60,4 @@ class Register
         }
 };
 
-RegisterPool *RegisterPool::instance = 0;
-
 #endif

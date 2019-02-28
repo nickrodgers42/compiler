@@ -16,7 +16,7 @@ class RegisterValue : public ExprValue {
         RegisterValue() {
             reg = new Register();
         }
-        Register* getRegister() {
+        Register* getRegister() override {
             return reg;
         }
 };

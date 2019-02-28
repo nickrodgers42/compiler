@@ -6,16 +6,22 @@
 class LiteralExpression : public Expression {
     private:
         int value;
-        ExprValue* exprVal = new LiteralValue();
     public:
-        LiteralExpression(int a) : value(a) {}
+        LiteralExpression() {}
+        LiteralExpression(int a, Type* t) : Expression(t), value(a) {}
         Register* emit() override {
-            // store the value in a register and return that register
-            std::cout << "addi " << exprVal->getRegister() << " $zero " << value << std::endl;
-            return exprVal->getRegister();
+            Register* result = new Register();
+            std::cout << "addi " << result->getRegister() << ", " 
+                      << "$zero" << ", " 
+                      << value
+                      << std::endl;
+            return result;
         }
         int getValue() {
             return value;
+        }
+        bool isConst() override {
+            return true;
         }
 };
 
