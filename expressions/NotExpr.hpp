@@ -14,6 +14,7 @@ class NotExpr : public Expression {
             std::cout << "not " << result->getRegister() << ", "
                       << regA->getRegister()
                       << std::endl;
+            delete regA;
             return result;
         }
 };

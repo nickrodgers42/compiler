@@ -5,13 +5,16 @@
 
 class IntegerType : public Type {
     private:
+        static IntegerType* instance;
         IntegerType() {}
     public:
         int size() override {
             return 4;
         };
         static IntegerType* getInstance() {
-            static IntegerType* instance;
+            if (instance == 0) {
+                instance = new IntegerType;
+            }
             return instance;
         }
         IntegerType(IntegerType const&) = delete;

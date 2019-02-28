@@ -12,6 +12,12 @@
 #include "./expressions/ExprMakers.hpp"
 #include "./types/StopStatement.hpp"
 
+IntegerType* IntegerType::instance = 0;
+CharacterType* CharacterType::instance = 0;
+BooleanType* BooleanType::instance = 0;
+StringType* StringType::instance = 0;
+
+
 // #include "symbol_table.hpp"
 
 extern int yylex();
@@ -246,9 +252,9 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
            | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = predValue($3); }
            | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = succValue($3); }
            | LValue {}
-           | NUMBER { $$ = new IntegerLiteral($1); }
-           | STR {}
-           | CHAR { $$ = new CharacterLiteral($1); }
+           | NUMBER { $$ = new LiteralExpression($1, IntegerType::getInstance()); }
+           | STR {$$ = }
+           | CHAR { $$ = new LiteralExpression($1, CharacterType::getInstance()); }
            ;
 
 LValue : IDENTIFIER {}

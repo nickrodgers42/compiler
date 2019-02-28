@@ -18,6 +18,8 @@ class DivExpr : public Expression{
                       << regB->getRegister() 
                       << std::endl;
             std::cout << "mfhi " << result->getRegister() << std::endl;
+            delete regA;
+            delete regB;
             return result;
         }
 };

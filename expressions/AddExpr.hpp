@@ -16,15 +16,15 @@ class AddExpr : public Expression {
         AddExpr(Expression* left, Expression* right, Type* type) :
             left(left), right(right), Expression(type) {}
         Register* emit() override {
-            auto regL = left->emit();
-            auto regR = right->emit();
+            auto regA = left->emit();
+            auto regB = right->emit();
             auto result = new Register();
             std::cout << "add " << result->getRegister() << ", "
-                      << regL->getRegister() << ", " 
-                      << regR->getRegister() 
+                      << regA->getRegister() << ", " 
+                      << regB->getRegister() 
                       << std::endl;
-            delete regL;
-            delete regR;
+            delete regA;
+            delete regB;
             return result;
         }
 };

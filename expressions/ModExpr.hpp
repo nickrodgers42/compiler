@@ -17,6 +17,8 @@ class ModExpr : public Expression {
                       << regB->getRegister() 
                       << std::endl;
             std::cout << "mflo " << result->getRegister() << std::endl;
+            delete regA;
+            delete regB;
             return result;
         }
 };

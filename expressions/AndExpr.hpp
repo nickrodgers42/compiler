@@ -17,6 +17,8 @@ class AndExpr : public Expression {
                       << regA->getRegister() << ", "
                       << regB->getRegister() 
                       << std::endl;
+            delete regA;
+            delete regB;
             return result;
         }
 };
