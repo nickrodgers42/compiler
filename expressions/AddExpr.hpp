@@ -10,14 +10,14 @@
 
 class AddExpr : public Expression {
     private: 
-        Expression* left;
-        Expression* right;
+        Expression* a;
+        Expression* b;
     public:
-        AddExpr(Expression* left, Expression* right, Type* type) :
-            left(left), right(right), Expression(type) {}
+        AddExpr(Expression* a, Expression* b, Type* type) :
+            a(a), b(b), Expression(type) {}
         Register* emit() override {
-            auto regA = left->emit();
-            auto regB = right->emit();
+            auto regA = a->emit();
+            auto regB = b->emit();
             auto result = new Register();
             std::cout << "add " << result->getRegister() << ", "
                       << regA->getRegister() << ", " 

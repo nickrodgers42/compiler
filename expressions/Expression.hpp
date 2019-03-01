@@ -9,6 +9,8 @@
 #include "LiteralValue.hpp"
 #include "RegisterValue.hpp"
 #include "../types/IntegerType.hpp"
+#include "../types/BooleanType.hpp"
+#include "../types/StringType.hpp"
 
 class Expression {
     private:

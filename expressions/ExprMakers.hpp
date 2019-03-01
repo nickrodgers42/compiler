@@ -1,8 +1,10 @@
 #ifndef EXPRMAKERS_HPP
 #define EXPRMAKERS_HPP
 
-#include "../exceptions/TypeMismatch.hpp"
+#include "../exceptions/customExceptions.hpp"
 #include "../register.hpp"
+#include "../symbol_table.hpp"
+extern SymbolTable symbol_table;
 
 #include "Expression.hpp"
 #include "LiteralExpression.hpp"
@@ -22,6 +24,14 @@
 #include "AndExpr.hpp"
 #include "NotExpr.hpp"
 #include "UnminusExpr.hpp"
+#include "PredExpr.hpp"
+#include "SuccExpr.hpp"
+#include "StringLiteral.hpp"
+
+#include "../types/IntegerType.hpp"
+#include "../types/CharacterType.hpp"
+#include "../types/BooleanType.hpp"
+#include "../types/StringType.hpp"
 
 Expression* getAddExpr(Expression* a, Expression* b);
 Expression* getSubExpr(Expression* a, Expression* b);
@@ -42,5 +52,7 @@ Expression* makeCharacterType(Expression* a);
 Expression* makeIntegerType(Expression* a);
 Expression* predValue(Expression* a);
 Expression* succValue(Expression* a);
+Expression* getStringLiteral(char* str);
+Expression* getCharLiteral(char* chr);
 
 #endif

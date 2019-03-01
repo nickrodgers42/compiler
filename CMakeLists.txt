@@ -13,13 +13,20 @@ set(EXTRA_COMPILE_FLAGS "-g3 -std=c++14")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 
+file(GLOB expressions
+  "./expressions/*"
+)
+
 set(cpsl
   register.hpp
+  symbol_table.hpp symbol_table.cpp
+  
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}
 )
 source_group("cpsl" FILES ${cpsl})
 
-add_executable(cpsl main.cpp ${cpsl})
+add_executable(cpsl main.cpp ${cpsl} ${expressions} )
+target_include_directories(cpsl PUBLIC ./expressions/)
 target_link_libraries(cpsl ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
 target_include_directories(cpsl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -9,14 +9,6 @@
 /* This section will be placed into the c++ file */
 #include <iostream>
 #include <map>
-#include "./expressions/ExprMakers.hpp"
-#include "./types/StopStatement.hpp"
-
-IntegerType* IntegerType::instance = 0;
-CharacterType* CharacterType::instance = 0;
-BooleanType* BooleanType::instance = 0;
-StringType* StringType::instance = 0;
-
 
 // #include "symbol_table.hpp"
 
@@ -25,12 +17,22 @@ extern int line_num;
 void yyerror(const char*);
 %}
 
+%code requires {
+    #include "./expressions/Expression.hpp"
+    #include "./expressions/ExprMakers.hpp"
+    #include "./statements/Statement.hpp"
+    #include "./statements/StopStatement.hpp"
+}
+
 %union
 {
     int val;
     char* id;
     char* string;
-    char chr;
+    char* chr;
+    Expression* expr;
+    Statement* statement;
+    std::vector<Statement*>* statementSeq;
 }
 
 %token ARRAY
@@ -84,7 +86,7 @@ void yyerror(const char*);
 %token OPER_SEMICOLON
 %token OPER_LPAREN
 %token OPER_RPAREN
-%token OPER_LBRACKET`
+%token OPER_LBRACKET
 %token OPER_RBRACKET
 %token OPER_ASSIGN
 %token OPER_MOD
@@ -96,6 +98,11 @@ void yyerror(const char*);
 %type <id> IDENTIFIER
 %type <chr> CHAR
 %type <string> STR
+%type <expr> Expression
+%type <statement> Statement
+%type <statementSeq> StatementSeq
+%type <statement> StopStatement
+%type <expr> LValue
 
 %right UNMINUS 
 %left OPER_MUL OPER_DIV OPER_MOD
@@ -177,8 +184,8 @@ IdentListTypeList : %empty {}
 
 VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList {};
 
-StatementSeq : Statement {}
-             | Statement OPER_SEMICOLON StatementSeq {}
+StatementSeq : StatementSeq OPER_SEMICOLON Statement {$1->push_back($3); $$ = $1; }
+             | Statement { auto v = new std::vector<Statement*>; v->push_back($1); $$ = v; }
              ;
 
 Statement : Assignment {}
@@ -208,16 +215,14 @@ ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression TO Expression DO StatementS
              | FOR IDENTIFIER OPER_ASSIGN Expression DOWNTO Expression DO StatementSeq END {}
              ;
 
-StopStatement : STOP {
-        $$ = new StopStatement();
-    };
+StopStatement : STOP {$$ = new StopStatement(); };
 
 ReturnStatement : RETURN {}
                 | RETURN Expression {}
                 ;
 ReadStatement : READ OPER_LPAREN LValueList OPER_RPAREN {};
 LValueList : LValue {}
-           | LvalueList OPER_COMMA LValue {}
+           | LValueList OPER_COMMA LValue {}
            ;
 WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN {};
 ProcedureCall : IDENTIFIER OPER_LPAREN OPER_RPAREN {} 
@@ -244,22 +249,22 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
            | Expression OPER_MOD Expression { $$ = getModExpr($1, $3); }
            | OPER_NOT Expression { $$ = getNotExpr($2); }
            | OPER_SUB Expression %prec UNMINUS {$$ = getUnminusExpr($2); }
-           | OPER_LPAREN Expression OPER_RPAREN { $$ = new Expression($2); }
+           | OPER_LPAREN Expression OPER_RPAREN { $$ = nullptr; }
            | IDENTIFIER OPER_LPAREN OPER_RPAREN { $$ = nullptr; }
            | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN { $$ = nullptr; }
            | CHR OPER_LPAREN Expression OPER_RPAREN { $$ = makeCharacterType($3); }
            | ORD OPER_LPAREN Expression OPER_RPAREN { $$ = makeIntegerType($3); }
            | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = predValue($3); }
            | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = succValue($3); }
-           | LValue {}
+           | LValue { $$ = nullptr; }
            | NUMBER { $$ = new LiteralExpression($1, IntegerType::getInstance()); }
-           | STR {$$ = }
-           | CHAR { $$ = new LiteralExpression($1, CharacterType::getInstance()); }
+           | STR {$$ = getStringLiteral($1); }
+           | CHAR { $$ = getCharLiteral($1); }
            ;
 
-LValue : IDENTIFIER {}
-       | LValue OPER_LBRACKET Expression OPER_RBRACKET {}
-       | LVALUE OPER_DOT IDENTIFIER {};
+LValue : IDENTIFIER {$$ = nullptr;}
+       | LValue OPER_LBRACKET Expression OPER_RBRACKET { $$ == nullptr; }
+       | LValue OPER_DOT IDENTIFIER {$$ = nullptr; };
 
 %%
 

@@ -102,12 +102,13 @@
 %{
    /* Character Constants */
 %}
-\'.\'|\'\\.\'        { yylval.id = strdup(yytext); return CHAR; }
+\'.^[\\]\'          { yylval.chr = strdup(yytext); return CHAR; }
+\'\\.\'             { yylval.chr = strdup(yytext); return CHAR; }
 
 %{
    /* String constants */
 %}
-\".*[^\n]\" { yylval.id = strdup(yytext); return STR; }
+\".*[^\n]\" { yylval.string = strdup(yytext); return STR; }
 
 %{
   /* Comments */

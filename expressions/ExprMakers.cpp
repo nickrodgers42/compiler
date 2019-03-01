@@ -202,18 +202,104 @@ Expression* getUnminusExpr(Expression* a) {
     }
 }
 
-Expression *makeCharacterType(Expression *a) {
-    if (a->getType() != )
-}
-
-Expression *makeIntegerType(Expression *a) {
-
-}
-
 Expression *predValue(Expression *a) {
-
+    if (a->getType() != BooleanType::getInstance() || a->getType() != CharacterType::getInstance() || a->getType() != IntegerType::getInstance()) {
+        throw IncorrectTypePassed();
+    }
+    if (a->isConst()) {
+        auto lita = dynamic_cast<LiteralExpression*>(a);
+        if (a->getType() == BooleanType::getInstance()) {
+            if (lita->getValue() != 0) {
+                return new LiteralExpression(0, lita->getType());
+            }
+            else {
+                return new LiteralExpression(1, lita->getType());
+            }
+        }
+        else {
+            return new LiteralExpression(lita->getValue() - 1, a->getType());
+        }
+    }
+    else {
+        return new PredExpr(a, a->getType());
+    }
 }
 
 Expression *succValue(Expression *a) {
+    if (a->getType() != BooleanType::getInstance() || a->getType() != CharacterType::getInstance() || a->getType() != IntegerType::getInstance()) {
+        throw IncorrectTypePassed();
+    }
+    if (a->isConst()) {
+        auto lita = dynamic_cast<LiteralExpression*>(a);
+        if (a->getType() == BooleanType::getInstance()) {
+            if (lita->getValue() != 0) {
+                return new LiteralExpression(0, lita->getType());
+            }
+            else {
+                return new LiteralExpression(1, lita->getType());
+            }
+        }
+        else {
+            return new LiteralExpression(lita->getValue() + 1, a->getType());
+        }
+    }
+    else {
+        return new SuccExpr(a, a->getType());
+    }
+}
 
+Expression* getStringLiteral(char* str) {
+    std::string strVal(str);
+    std::string label = symbol_table.storeString(strVal);
+    return new StringLiteral(label);
+}
+
+Expression* getCharLiteral(char* character) {
+    std::string chrVal(character);
+    if (chrVal.size() > 2) {
+        throw CharTooBig();
+    }
+    if (chrVal[0] == '\\' && chrVal.size() == 2) {
+        if (chrVal[1] == 'n'){
+            return new LiteralExpression(int('\n'), CharacterType::getInstance());
+        }
+        if (chrVal[1] == 'r')
+        {
+            return new LiteralExpression(int('\r'), CharacterType::getInstance());
+        }
+        if (chrVal[1] == 'b')
+        {
+            return new LiteralExpression(int('\b'), CharacterType::getInstance());
+        }
+        if (chrVal[1] == 'f')
+        {
+            return new LiteralExpression(int('\f'), CharacterType::getInstance());
+        }
+        if (chrVal[1] == 't')
+        {
+            return new LiteralExpression(int('\t'), CharacterType::getInstance());
+        }
+        else {
+            return new LiteralExpression(int(chrVal[1]), CharacterType::getInstance());
+        }
+    }
+    else
+    {
+        return new LiteralExpression(int(chrVal[0]), CharacterType::getInstance());
+    }
+}
+Expression* makeCharacterType(Expression* a) {
+    if (a->getType() != IntegerType::getInstance()) {
+        throw IncorrectTypePassed();
+    }
+    a->setType(CharacterType::getInstance());
+    return a;
+}
+
+Expression* makeIntegerType(Expression* a) {
+    if (a->getType() != CharacterType::getInstance()) {
+        throw IncorrectTypePassed();
+    }
+    a->setType(CharacterType::getInstance());
+    return a;
 }
