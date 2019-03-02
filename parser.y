@@ -121,6 +121,7 @@ void yyerror(const char*);
 %type <statement> Statement
 %type <statementSeq> StatementSeq
 %type <statement> StopStatement
+%type <statement> ReadStatement
 %type <statement> WriteStatement
 %type <expr> LValue
 %type <blockNode> Block
@@ -221,21 +222,17 @@ IdentListTypeList : %empty {}
 
 VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList {};
 
-StatementSeq : StatementSeq OPER_SEMICOLON Statement { 
-                $1->push_back($3);
+StatementSeq : StatementSeq Statement OPER_SEMICOLON { 
+                $1->push_back($2);
                 $$ = $1;
                }
-             | Statement {
+             | Statement OPER_SEMICOLON {
                 auto v = new std::vector<Statement*>; 
                 v->push_back($1); 
                 $$ = v; 
               }
-            | Statement OPER_SEMICOLON {
-                auto v = new std::vector<Statement*>; 
-                v->push_back($1); 
-                $$ = v; 
-            }
              ;
+
 
 Statement : Assignment {}
           | IfStatement {}

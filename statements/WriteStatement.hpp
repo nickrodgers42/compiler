@@ -10,26 +10,26 @@ class WriteStatement : public Statement {
         WriteStatement(std::vector<Expression*>* exprList) : exprList(exprList) {}
         void emit() override {
             for (auto e : *exprList) {
-                if (e->getType() == IntegerType::getInstance() || e->getType() == BooleanType::getInstance()) {
+                if (e != nullptr) {
                     auto regA = e->emit();
-                    std::cout << "li $v0, 1" << std::endl;
-                    std::cout << "add $a0, " << regA->getRegister() << ", $zero" << std::endl;
-                    std::cout << "syscall" << std::endl;
-                }
-                else if (e->getType() == CharacterType::getInstance()) {
-                    auto regA = e->emit();
-                    std::cout << "li $v0 11" << std::endl;
-                    std::cout << "add $a0, " << regA->getRegister() << ", $zero" << std::endl;
-                    std::cout << "syscall" << std::endl;
-                }
-                else if (e->getType() == StringType::getInstance()) {
-                    auto regA = e->emit();
-                    std::cout << "li $v0 4" << std::endl;
-                    std::cout << "la $a0 (" << regA->getRegister() << ")" << std::endl;
-                    std::cout << "syscall" << std::endl;
-                }
-                else {
-                    throw IncorrectTypePassed();
+                    if (e->getType() == IntegerType::getInstance() || e->getType() == BooleanType::getInstance()) {
+                        std::cout << "li $v0, 1" << std::endl;
+                        std::cout << "add $a0, " << regA->getRegister() << ", $zero" << std::endl;
+                        std::cout << "syscall" << std::endl;
+                    }
+                    else if (e->getType() == CharacterType::getInstance()) {
+                        std::cout << "li $v0 11" << std::endl;
+                        std::cout << "add $a0, " << regA->getRegister() << ", $zero" << std::endl;
+                        std::cout << "syscall" << std::endl;
+                    }
+                    else if (e->getType() == StringType::getInstance()) {
+                        std::cout << "li $v0 4" << std::endl;
+                        std::cout << "la $a0 (" << regA->getRegister() << ")" << std::endl;
+                        std::cout << "syscall" << std::endl;
+                    }
+                    else {
+                        throw IncorrectTypePassed();
+                    }
                 }
             }
         }
