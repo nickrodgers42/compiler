@@ -2,8 +2,9 @@
 #define LVAL_HPP
 
 #include "../register.hpp"
+#include "Expression.hpp"
 
-class Lval {
+class Lval : public Expression {
     private:
         int offSet;
         Register* reg;

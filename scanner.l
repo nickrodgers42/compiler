@@ -122,8 +122,8 @@
 %{
    /* Whitespace */
 %}
-[ \t] {}
+[ \t\r] {}
 \n { line_num++; }
 
-. { std::cout << "Complain bitterly" << std::endl; }
+. { std::cout << "Complain bitterly " << std::string(yytext) << std::endl; }
 %%

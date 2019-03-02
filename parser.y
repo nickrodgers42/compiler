@@ -31,6 +31,8 @@ void yyerror(const char*);
     #include "./nodes/BodyNode.hpp"
     #include "./types/Type.hpp"
     #include "./decls/ConstDecls.hpp"
+    #include "./decls/Decls.hpp"
+    #include "./nodes/ProgramNode.hpp"
 }
 
 %union
@@ -46,6 +48,8 @@ void yyerror(const char*);
     BlockNode* blockNode;
     Type* type;
     std::vector<std::pair<std::string, Expression*>>* identExprListPairs;
+    ConstDecls* constDecls;
+    Node* node;
 }
 
 %token ARRAY
@@ -121,6 +125,9 @@ void yyerror(const char*);
 %type <type> Type
 %type <type> SimpleType
 %type <identExprListPairs> IdentExprList
+%type <constDecls> OptionalConstDecl
+%type <constDecls> ConstantDecl
+%type <node> Body
 
 %right UNMINUS 
 %left OPER_MUL OPER_DIV OPER_MOD
@@ -134,10 +141,14 @@ void yyerror(const char*);
 %%
 
 
-Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT { symbol_table.enterScope(); };
+Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT { 
+    auto p = new ProgramNode($5); 
+    p->emit();
+    delete p;
+  };
 
-OptionalConstDecl : %empty {}
-                  | ConstantDecl {}
+OptionalConstDecl : %empty { $$ = nullptr; }
+                  | ConstantDecl { $$ = $1; }
                   ;
 OptionalTypeDecl : %empty {}
                  | TypeDecl {}
@@ -150,7 +161,7 @@ ProcOrFuncList : %empty {}
                | ProcOrFuncList FuncDecl {}
                ;
 
-ConstantDecl : CONST IdentExprList { declareConsts($2); };
+ConstantDecl : CONST IdentExprList { $$ = new ConstDecls($2); };
 
 IdentExprList : IdentExprList IDENTIFIER OPER_EQ Expression OPER_SEMICOLON { 
                   auto p = std::make_pair(std::string($2), $4);
@@ -183,7 +194,7 @@ VarOrRef : %empty {}
          | REF {}
          ;
 
-Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block { symbol_table.enterScope(); };
+Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block { $$ = new BodyNode($4); };
 
 Block : BEGIN_TOKEN StatementSeq END { $$ = new BlockNode($2); };
 
@@ -291,7 +302,8 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
 
 LValue : IDENTIFIER { $$ = symbol_table.lookupLVal($1); }
        | LValue OPER_LBRACKET Expression OPER_RBRACKET { $$ == nullptr; }
-       | LValue OPER_DOT IDENTIFIER {$$ = nullptr; };
+       | LValue OPER_DOT IDENTIFIER {$$ = nullptr; }
+       ;
 
 %%
 

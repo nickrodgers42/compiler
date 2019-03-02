@@ -24,6 +24,7 @@ void SymbolTable::declareConst(std::string ident, Expression *expr) {
 }
 
 Expression* SymbolTable::lookupLVal(std::string ident) {
+    std::cout << "Looking for " << ident << std::endl;
     for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
         auto findConstant = it->constants.find(ident);
         if (findConstant != it->constants.end()) {
@@ -36,4 +37,11 @@ Expression* SymbolTable::lookupLVal(std::string ident) {
 void SymbolTable::enterScope() {
     std::cout << "New Scope" << std::endl;
     scopes.emplace_back();
+}
+
+void SymbolTable::emitStrings() {
+    std::cout << ".data" << std::endl;
+    for (auto i = 0; i < strings.size(); ++i) {
+        std::cout << "str" << std::to_string(i) << ": " << strings[i] << std::endl;
+    }
 }
