@@ -305,6 +305,10 @@ Expression* makeIntegerType(Expression* a) {
     return a;
 }
 
+Expression* lookupLVal(std::string ident) {
+    return symbol_table.lookupLVal(ident);
+}
+
 void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList) {
     for (auto i : *IdentExprList) {
         symbol_table.declareConst(i.first, i.second);

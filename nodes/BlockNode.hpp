@@ -12,7 +12,9 @@ class BlockNode {
         BlockNode(std::vector<Statement*>* statements) : statements(statements) {}
         void emit() {
             for (auto s : *statements) {
-                s->emit();
+                if (s != nullptr) {
+                    s->emit();
+                }
             }
         }
 };

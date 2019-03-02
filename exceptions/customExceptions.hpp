@@ -40,5 +40,11 @@ class undefinedVariable : public std::exception {
         }
 };
 
+class incorrectTypePassed : public std::exception {
+    public:
+        const char* what() const throw() {
+            return "An incorrect type has been passed";
+        }
+};
 
 #endif

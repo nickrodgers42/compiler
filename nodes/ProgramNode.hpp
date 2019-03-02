@@ -22,7 +22,9 @@ class ProgramNode : public Node {
             block->emit();
         }
         ~ProgramNode() {
-            delete block;
+            std::cout << "li $v0 10\n"
+                      << "syscall"
+                      << std::endl;
             symbol_table.emitStrings();
         };
 };

@@ -18,8 +18,6 @@ Type* SymbolTable::lookupType(std::string ident) {
 }
 
 void SymbolTable::declareConst(std::string ident, Expression *expr) {
-    std::cout << "New constant " << ident << std::endl;
-    expr->emit();
     scopes.back().constants.emplace(ident, expr);
 }
 
@@ -42,6 +40,6 @@ void SymbolTable::enterScope() {
 void SymbolTable::emitStrings() {
     std::cout << ".data" << std::endl;
     for (auto i = 0; i < strings.size(); ++i) {
-        std::cout << "str" << std::to_string(i) << ": " << strings[i] << std::endl;
+        std::cout << "str" << std::to_string(i) << ": .asciiz " << strings[i] << std::endl;
     }
 }

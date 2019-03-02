@@ -58,6 +58,11 @@ Expression* predValue(Expression* a);
 Expression* succValue(Expression* a);
 Expression* getStringLiteral(char* str);
 Expression* getCharLiteral(char* chr);
-void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList);;
+Expression* lookupLVal(std::string ident);
+Expression* getFunctionExpr(std::string ident);
+Expression* getFunctionExpr(std::string ident, std::vector<Expression*> args);
+
+void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList);
+
 
 #endif

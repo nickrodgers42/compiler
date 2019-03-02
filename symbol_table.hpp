@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 #include <map>
 
 #include "./types/Type.hpp"
@@ -15,6 +16,7 @@
 #include "./expressions/LiteralExpression.hpp"
 
 #include "./exceptions/customExceptions.hpp"
+#include "./nodes/BlockNode.hpp"
 
 struct Scope {
     // std::map<std::string, std::string> strs;
@@ -31,7 +33,7 @@ class SymbolTable
         std::vector<Scope> scopes;
     public:
         SymbolTable() {
-            Scope predefined = Scope();
+            Scope predefined = Scope(); 
             predefined.types.emplace("integer", IntegerType::getInstance());
             predefined.types.emplace("INTEGER", IntegerType::getInstance());
             predefined.types.emplace("char", CharacterType::getInstance());

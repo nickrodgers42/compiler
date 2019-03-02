@@ -33,6 +33,7 @@ void yyerror(const char*);
     #include "./decls/ConstDecls.hpp"
     #include "./decls/Decls.hpp"
     #include "./nodes/ProgramNode.hpp"
+    #include "./statements/WriteStatement.hpp"
 }
 
 %union
@@ -120,6 +121,7 @@ void yyerror(const char*);
 %type <statement> Statement
 %type <statementSeq> StatementSeq
 %type <statement> StopStatement
+%type <statement> WriteStatement
 %type <expr> LValue
 %type <blockNode> Block
 %type <type> Type
@@ -185,14 +187,11 @@ FuncDecl : FUNCTION IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_COLON T
          ;
 
 FormalParams : %empty {}
-             | VarOrRef IdentList OPER_COLON Type {}
-             | VarOrRef IdentList OPER_COLON Type OPER_SEMICOLON FormalParams {}
+             | VAR IdentList OPER_COLON Type {}
+             | REF IdentList OPER_COLON Type {}
+             | FormalParams OPER_SEMICOLON VAR IdentList OPER_COLON TYPE {}
+             | FormalParams OPER_SEMICOLON REF IdentList OPER_COLON Type {}
              ;
-
-VarOrRef : %empty {}
-         | VAR {}
-         | REF {}
-         ;
 
 Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block { $$ = new BodyNode($4); };
 
@@ -222,8 +221,20 @@ IdentListTypeList : %empty {}
 
 VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList {};
 
-StatementSeq : StatementSeq OPER_SEMICOLON Statement { $1->push_back($3); $$ = $1; }
-             | Statement { auto v = new std::vector<Statement*>; v->push_back($1); $$ = v; }
+StatementSeq : StatementSeq OPER_SEMICOLON Statement { 
+                $1->push_back($3);
+                $$ = $1;
+               }
+             | Statement {
+                auto v = new std::vector<Statement*>; 
+                v->push_back($1); 
+                $$ = v; 
+              }
+            | Statement OPER_SEMICOLON {
+                auto v = new std::vector<Statement*>; 
+                v->push_back($1); 
+                $$ = v; 
+            }
              ;
 
 Statement : Assignment {}
@@ -233,8 +244,8 @@ Statement : Assignment {}
           | ForStatement {}
           | StopStatement { $$ = $1; }
           | ReturnStatement {}
-          | ReadStatement {}
-          | WriteStatement {}
+          | ReadStatement { $$ = $1; }
+          | WriteStatement { $$ = $1; }
           | ProcedureCall {}
           | NullStatement {}
           ;
@@ -262,7 +273,7 @@ ReadStatement : READ OPER_LPAREN LValueList OPER_RPAREN {};
 LValueList : LValue {}
            | LValueList OPER_COMMA LValue {}
            ;
-WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN {};
+WriteStatement : WRITE OPER_LPAREN ExpressionList OPER_RPAREN { $$ = new WriteStatement($3); };
 ProcedureCall : IDENTIFIER OPER_LPAREN OPER_RPAREN {} 
               | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN {}
               ;
@@ -300,7 +311,7 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
            | CHAR { $$ = getCharLiteral($1); }
            ;
 
-LValue : IDENTIFIER { $$ = symbol_table.lookupLVal($1); }
+LValue : IDENTIFIER { $$ = lookupLVal($1); }
        | LValue OPER_LBRACKET Expression OPER_RBRACKET { $$ == nullptr; }
        | LValue OPER_DOT IDENTIFIER {$$ = nullptr; }
        ;
