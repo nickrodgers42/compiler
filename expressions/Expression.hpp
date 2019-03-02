@@ -12,6 +12,7 @@
 #include "../types/BooleanType.hpp"
 #include "../types/StringType.hpp"
 
+
 class Expression {
     private:
         Type* type;
@@ -19,7 +20,7 @@ class Expression {
         Expression() = default;
         ~Expression() = default;
         Expression(Type* type) : type(type) {}
-        Type* getType() {
+        virtual Type* getType() {
             return type;
         };
         void setType(Type* t) {
@@ -27,6 +28,7 @@ class Expression {
         }
         virtual bool isConst() { return false; }
         virtual Register* emit() = 0;
+        virtual bool isLval() { return false; }
 };
 
 #endif

@@ -55,9 +55,8 @@ class SymbolTable
         void declareConst(std::string ident, Expression* expr);
         Expression* lookupLVal(std::string ident);
         void enterScope();
+        void exitScope();
         void emitStrings();
-      // lookup(std::string identifier);
-      // void exit_scope();
 };
 
 extern SymbolTable symbol_table;

@@ -15,6 +15,9 @@ class StringLiteral : public LiteralExpression {
                       << std::endl;
             return result;
         }
+        std::string getLabel() {
+            return label;
+        }
 };
 
 #endif

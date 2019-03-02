@@ -31,6 +31,7 @@ extern SymbolTable symbol_table;
 #include "PredExpr.hpp"
 #include "SuccExpr.hpp"
 #include "StringLiteral.hpp"
+#include "LValExpr.hpp"
 
 #include "../types/IntegerType.hpp"
 #include "../types/CharacterType.hpp"
@@ -58,9 +59,8 @@ Expression* predValue(Expression* a);
 Expression* succValue(Expression* a);
 Expression* getStringLiteral(char* str);
 Expression* getCharLiteral(char* chr);
+Expression* makeLValueExpr(std::string ident);
 Expression* lookupLVal(std::string ident);
-Expression* getFunctionExpr(std::string ident);
-Expression* getFunctionExpr(std::string ident, std::vector<Expression*> args);
 
 void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList);
 

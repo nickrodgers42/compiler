@@ -145,7 +145,7 @@ void yyerror(const char*);
 
 
 Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT { 
-    auto p = new ProgramNode($5); 
+    auto p = new ProgramNode($1, $5); 
     p->emit();
     delete p;
   };
@@ -194,7 +194,7 @@ FormalParams : %empty {}
              | FormalParams OPER_SEMICOLON REF IdentList OPER_COLON Type {}
              ;
 
-Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block { $$ = new BodyNode($4); };
+Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block { $$ = new BodyNode($1, $4); };
 
 Block : BEGIN_TOKEN StatementSeq END { $$ = new BlockNode($2); };
 
@@ -308,7 +308,7 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
            | CHAR { $$ = getCharLiteral($1); }
            ;
 
-LValue : IDENTIFIER { $$ = lookupLVal($1); }
+LValue : IDENTIFIER { $$ = new LValExpr($1); }
        | LValue OPER_LBRACKET Expression OPER_RBRACKET { $$ == nullptr; }
        | LValue OPER_DOT IDENTIFIER {$$ = nullptr; }
        ;

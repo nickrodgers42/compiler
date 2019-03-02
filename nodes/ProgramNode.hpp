@@ -9,11 +9,11 @@ class ProgramNode : public Node {
     private:
         BlockNode* block;
     public:
-        ProgramNode(BlockNode* block) : block(block) {
-            // symbol_table.enterScope();
-            // if (constDecls != nullptr) {
-            //     declareConsts(constDecls->getDecls());
-            // }
+        ProgramNode(ConstDecls* constDecls, BlockNode* block) : block(block) {
+            symbol_table.enterScope();
+            if (constDecls != nullptr) {
+                declareConsts(constDecls->getDecls());
+            }
         }
         void emit() {
             std::cout << ".text" << std::endl;

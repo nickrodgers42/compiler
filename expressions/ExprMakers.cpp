@@ -309,8 +309,21 @@ Expression* lookupLVal(std::string ident) {
     return symbol_table.lookupLVal(ident);
 }
 
+Expression* makeLValueExpr(std::string ident) {
+    std::cout << ident << std::endl;
+    return new LValExpr(ident);
+}
+
+
 void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList) {
     for (auto i : *IdentExprList) {
-        symbol_table.declareConst(i.first, i.second);
+        if (i.second->isLval()) {
+            auto l = dynamic_cast<LValExpr*>(i.second);
+            auto expr = symbol_table.lookupLVal(l->getIdent());
+            symbol_table.declareConst(i.first, expr);
+        }
+        else {
+            symbol_table.declareConst(i.first, i.second);
+        }
     }
 }

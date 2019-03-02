@@ -7,14 +7,13 @@
 
 class BodyNode : public Node {
     private:
-        ConstDecls* constDecls;
         BlockNode* block;
     public:
-        BodyNode(BlockNode* block) : block(block) {
-            // symbol_table.enterScope();
-            // if (constDecls != nullptr) {
-            //     declareConsts(constDecls->getDecls());
-            // }
+        BodyNode(ConstDecls* constDecls, BlockNode* block) :  block(block) {
+            symbol_table.enterScope();
+            if (constDecls != nullptr) {
+                declareConsts(constDecls->getDecls());
+            }
         };
         void emit() {
             block->emit();
