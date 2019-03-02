@@ -25,4 +25,20 @@ class CharTooBig : public std::exception {
         }
 };
 
+class undefinedType : public std::exception {
+    public:
+        const char* what() const throw() {
+            return "Type is undefined";
+        }
+};
+
+
+class undefinedVariable : public std::exception {
+    public:
+        const char* what() const throw() {
+            return "Variable is undefined";
+        }
+};
+
+
 #endif

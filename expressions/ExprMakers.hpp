@@ -1,6 +1,10 @@
 #ifndef EXPRMAKERS_HPP
 #define EXPRMAKERS_HPP
 
+#include <vector>
+#include <string>
+#include <utility>
+
 #include "../exceptions/customExceptions.hpp"
 #include "../register.hpp"
 #include "../symbol_table.hpp"
@@ -54,5 +58,6 @@ Expression* predValue(Expression* a);
 Expression* succValue(Expression* a);
 Expression* getStringLiteral(char* str);
 Expression* getCharLiteral(char* chr);
+void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList);;
 
 #endif

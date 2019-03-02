@@ -20,6 +20,7 @@ file(GLOB expressions
 set(cpsl
   register.hpp
   symbol_table.hpp symbol_table.cpp
+  nodes/BlockNode.hpp
   
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}

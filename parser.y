@@ -9,12 +9,17 @@
 /* This section will be placed into the c++ file */
 #include <iostream>
 #include <map>
+#include <utility>
+#include <vector> 
+
 
 // #include "symbol_table.hpp"
 
 extern int yylex();
 extern int line_num;
 void yyerror(const char*);
+
+
 %}
 
 %code requires {
@@ -22,6 +27,10 @@ void yyerror(const char*);
     #include "./expressions/ExprMakers.hpp"
     #include "./statements/Statement.hpp"
     #include "./statements/StopStatement.hpp"
+    #include "./nodes/BlockNode.hpp"
+    #include "./nodes/BodyNode.hpp"
+    #include "./types/Type.hpp"
+    #include "./decls/ConstDecls.hpp"
 }
 
 %union
@@ -31,8 +40,12 @@ void yyerror(const char*);
     char* string;
     char* chr;
     Expression* expr;
+    std::vector<Expression*>* expressionList;
     Statement* statement;
     std::vector<Statement*>* statementSeq;
+    BlockNode* blockNode;
+    Type* type;
+    std::vector<std::pair<std::string, Expression*>>* identExprListPairs;
 }
 
 %token ARRAY
@@ -99,10 +112,15 @@ void yyerror(const char*);
 %type <chr> CHAR
 %type <string> STR
 %type <expr> Expression
+%type <expressionList> ExpressionList
 %type <statement> Statement
 %type <statementSeq> StatementSeq
 %type <statement> StopStatement
 %type <expr> LValue
+%type <blockNode> Block
+%type <type> Type
+%type <type> SimpleType
+%type <identExprListPairs> IdentExprList
 
 %right UNMINUS 
 %left OPER_MUL OPER_DIV OPER_MOD
@@ -116,7 +134,7 @@ void yyerror(const char*);
 %%
 
 
-Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT {};
+Program : OptionalConstDecl OptionalTypeDecl OptionalVarDecl ProcOrFuncList Block OPER_DOT { symbol_table.enterScope(); };
 
 OptionalConstDecl : %empty {}
                   | ConstantDecl {}
@@ -128,14 +146,23 @@ OptionalVarDecl : %empty {}
                 | VarDecl {}
                 ;
 ProcOrFuncList : %empty {}
-               | ProcDecl ProcOrFuncList {}
-               | FuncDecl ProcOrFuncList {}
+               | ProcOrFuncList ProcDecl {}
+               | ProcOrFuncList FuncDecl {}
                ;
 
-ConstantDecl : CONST IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList {};
+ConstantDecl : CONST IdentExprList { declareConsts($2); };
 
-IdentExprList : %empty {}
-              | IDENTIFIER OPER_EQ Expression OPER_SEMICOLON IdentExprList {}
+IdentExprList : IdentExprList IDENTIFIER OPER_EQ Expression OPER_SEMICOLON { 
+                  auto p = std::make_pair(std::string($2), $4);
+                  $1->push_back(p);
+                  $$ = $1;
+                }
+              | IDENTIFIER OPER_EQ Expression OPER_SEMICOLON { 
+                  auto p = std::make_pair(std::string($1), $3);
+                  auto v = new std::vector<std::pair<std::string, Expression*>>;
+                  v->push_back(p);
+                  $$ = v;
+                }
               ;
 
 ProcDecl : PROCEDURE IDENTIFIER OPER_LPAREN FormalParams OPER_RPAREN OPER_SEMICOLON FORWARD OPER_SEMICOLON {}
@@ -156,9 +183,9 @@ VarOrRef : %empty {}
          | REF {}
          ;
 
-Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block {};
+Body : OptionalConstDecl OptionalTypeDecl OptionalVarDecl Block { symbol_table.enterScope(); };
 
-Block : BEGIN_TOKEN StatementSeq END {};
+Block : BEGIN_TOKEN StatementSeq END { $$ = new BlockNode($2); };
 
 TypeDecl : TYPE IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList {};
 
@@ -166,12 +193,12 @@ IdentTypeList : %empty {}
               | IDENTIFIER OPER_EQ Type OPER_SEMICOLON IdentTypeList {}
               ;
 
-Type : SimpleType {}
-     | RecordType {}
-     | ArrayType {}
+Type : SimpleType { $$ = $1; }
+     | RecordType { $$ = nullptr; }
+     | ArrayType { $$ = nullptr; }
      ;
 
-SimpleType : IDENTIFIER {} ;
+SimpleType : IDENTIFIER { $$ = symbol_table.lookupType($1); } ;
 RecordType : RECORD IdentListTypeList END {} ;
 ArrayType  : ARRAY OPER_LBRACKET Expression OPER_COLON Expression OPER_RBRACKET OF Type {};
 IdentList  : IDENTIFIER {}
@@ -184,7 +211,7 @@ IdentListTypeList : %empty {}
 
 VarDecl : VAR IdentList OPER_COLON Type OPER_SEMICOLON IdentListTypeList {};
 
-StatementSeq : StatementSeq OPER_SEMICOLON Statement {$1->push_back($3); $$ = $1; }
+StatementSeq : StatementSeq OPER_SEMICOLON Statement { $1->push_back($3); $$ = $1; }
              | Statement { auto v = new std::vector<Statement*>; v->push_back($1); $$ = v; }
              ;
 
@@ -193,7 +220,7 @@ Statement : Assignment {}
           | WhileStatement {}
           | RepeatStatement {}
           | ForStatement {}
-          | StopStatement {$$ = $1;}
+          | StopStatement { $$ = $1; }
           | ReturnStatement {}
           | ReadStatement {}
           | WriteStatement {}
@@ -215,7 +242,7 @@ ForStatement : FOR IDENTIFIER OPER_ASSIGN Expression TO Expression DO StatementS
              | FOR IDENTIFIER OPER_ASSIGN Expression DOWNTO Expression DO StatementSeq END {}
              ;
 
-StopStatement : STOP {$$ = new StopStatement(); };
+StopStatement : STOP { $$ = new StopStatement(); };
 
 ReturnStatement : RETURN {}
                 | RETURN Expression {}
@@ -229,8 +256,8 @@ ProcedureCall : IDENTIFIER OPER_LPAREN OPER_RPAREN {}
               | IDENTIFIER OPER_LPAREN ExpressionList OPER_RPAREN {}
               ;
 
-ExpressionList : ExpressionList OPER_COMMA Expression {}
-               | Expression {}
+ExpressionList : ExpressionList OPER_COMMA Expression { $1->push_back($3); $$ = $1; }
+               | Expression { auto v = new std::vector<Expression*>; v->push_back($1); $$ = v; }
                ;
 NullStatement : %empty {};
 
@@ -256,13 +283,13 @@ Expression : Expression OPER_OR Expression  { $$ = getOrExpr($1, $3); }
            | ORD OPER_LPAREN Expression OPER_RPAREN { $$ = makeIntegerType($3); }
            | PRED OPER_LPAREN Expression OPER_RPAREN { $$ = predValue($3); }
            | SUCC OPER_LPAREN Expression OPER_RPAREN { $$ = succValue($3); }
-           | LValue { $$ = nullptr; }
+           | LValue { $$ = $1; }
            | NUMBER { $$ = new LiteralExpression($1, IntegerType::getInstance()); }
            | STR {$$ = getStringLiteral($1); }
            | CHAR { $$ = getCharLiteral($1); }
            ;
 
-LValue : IDENTIFIER {$$ = nullptr;}
+LValue : IDENTIFIER { $$ = symbol_table.lookupLVal($1); }
        | LValue OPER_LBRACKET Expression OPER_RBRACKET { $$ == nullptr; }
        | LValue OPER_DOT IDENTIFIER {$$ = nullptr; };
 

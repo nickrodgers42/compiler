@@ -256,6 +256,7 @@ Expression* getStringLiteral(char* str) {
 
 Expression* getCharLiteral(char* character) {
     std::string chrVal(character);
+    chrVal = chrVal.substr(1,chrVal.size() -1);
     if (chrVal.size() > 2) {
         throw CharTooBig();
     }
@@ -302,4 +303,10 @@ Expression* makeIntegerType(Expression* a) {
     }
     a->setType(CharacterType::getInstance());
     return a;
+}
+
+void declareConsts(std::vector<std::pair<std::string, Expression*>>* IdentExprList) {
+    for (auto i : *IdentExprList) {
+        symbol_table.declareConst(i.first, i.second);
+    }
 }

@@ -102,7 +102,7 @@
 %{
    /* Character Constants */
 %}
-\'.^[\\]\'          { yylval.chr = strdup(yytext); return CHAR; }
+\'[^\\]\'           { yylval.chr = strdup(yytext); return CHAR; }
 \'\\.\'             { yylval.chr = strdup(yytext); return CHAR; }
 
 %{
@@ -119,11 +119,11 @@
    /* Errors */
 %}
  
-
 %{
    /* Whitespace */
 %}
 [ \t] {}
 \n { line_num++; }
 
+. { std::cout << "Complain bitterly" << std::endl; }
 %%

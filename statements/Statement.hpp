@@ -7,6 +7,7 @@
 #include "../register.hpp"
 
 class Statement {
+    public:
     virtual void emit() = 0;
 };
 
